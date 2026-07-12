@@ -45,29 +45,42 @@
 
 ## Approach 1 (Optimized Backtracking)
 ### Intuition
-Imagine you're shopping at a store, and you want to buy a combination of items that add up to a certain amount of money. The items are arranged in ascending order of price, and you can't buy the same item more than once. This problem is similar, where we have an array of candidates (item prices) and a target sum. We use backtracking to explore all possible combinations of candidates that add up to the target sum.
+The given problem is a classic example of a combination sum problem with a twist - each number in the combination must be unique. To solve this, we can use a backtracking approach. Think of backtracking as exploring all possible paths in a maze. In this case, we're exploring all possible combinations of numbers that add up to the target. The intuition behind this approach is to use a recursive function to add numbers to our current combination, and when we reach a point where we can't add any more numbers (either because we've reached the target or we've exceeded it), we backtrack and try a different path.
 
 ### Approach
-The algorithm works by:
-1. Sorting the candidates array in ascending order.
-2. Starting from the first candidate, recursively adding each candidate to the current combination and exploring further.
-3. If the current combination exceeds the target sum, we stop exploring this branch.
-4. If the current combination equals the target sum, we add it to the result list.
-5. To avoid duplicates, we skip the same candidate if it's already been used in the current combination.
+Here's a step-by-step breakdown of the algorithmic logic:
+
+1. Sort the input array in ascending order to make it easier to break out of the loop when the current number exceeds the target.
+2. Initialize an empty list to store the result and an empty list to store the current combination.
+3. Start a recursive backtracking function with the initial index set to 0.
+4. Inside the backtracking function, check if the target has been reached. If so, add the current combination to the result list.
+5. If the target is less than 0, return immediately to backtrack.
+6. Iterate through the input array starting from the current index. For each number:
+   - Check if the number exceeds the target. If so, break out of the loop because all subsequent numbers will also exceed the target due to the sorting.
+   - Check if the current number is the same as the previous one and we're not at the first index. If so, skip this number to avoid duplicates in the combination.
+   - Add the current number to the current combination.
+   - Recursively call the backtracking function with the updated target and the next index.
+   - Remove the last added number from the current combination to backtrack.
 
 ### Detailed Code Analysis
 Let's dive into the code:
-- We start by initializing an empty result list `result` and sorting the `candidates` array in ascending order (lines 3-4).
-- We then call the `backtrack` function with the initial parameters: `candidates`, `target`, `0` (starting index), `result`, and an empty list `l1` to store the current combination (line 5).
-- In the `backtrack` function:
-  - If the `target` becomes `0`, we add the current combination `l1` to the `result` list (lines 9-11).
-  - If the `target` becomes negative, we stop exploring this branch (lines 12-14).
-  - We iterate through the `candidates` array starting from the current `index`. For each candidate:
-    - If the candidate exceeds the `target`, we break the loop since all subsequent candidates will also exceed the `target` due to the sorting (lines 16-18).
-    - If we've already used the same candidate in the current combination, we skip it to avoid duplicates (line 19).
-    - We add the candidate to the current combination `l1` (line 20).
-    - We recursively call the `backtrack` function with the updated parameters: `candidates`, `target - candidates[i]`, `i + 1` (to avoid using the same candidate again), `result`, and `l1` (line 21).
-    - After the recursive call, we remove the last added candidate from `l1` to backtrack and explore other branches (line 22).
+
+- Line 2: `public List<List<Integer>> combinationSum2(int[] candidates, int target)`: This is the main function where we initialize the input array and the target.
+- Line 3: `List<List<Integer>> result = new ArrayList<>();`: We initialize an empty list to store the result.
+- Line 4: `Arrays.sort(candidates);`: We sort the input array in ascending order.
+- Line 5: `backtrack(candidates, target, 0, result, new ArrayList<>())`: We start the recursive backtracking function with the initial index set to 0 and an empty list for the current combination.
+- Inside the `backtrack` function:
+  - Line 9: `if (target == 0)`: We check if the target has been reached.
+  - Line 10: `result.add(new ArrayList<>(l1))`: If the target has been reached, we add the current combination to the result list.
+  - Line 12: `if (target < 0)`: We check if the target is less than 0.
+  - Line 13: `return`: If the target is less than 0, we return immediately to backtrack.
+  - Line 15: `for (int i = index; i < candidates.length; i++)`: We iterate through the input array starting from the current index.
+  - Line 16: `if (candidates[i] > target)`: We check if the current number exceeds the target.
+  - Line 17: `break`: If the current number exceeds the target, we break out of the loop.
+  - Line 19: `if (i > index && candidates[i] == candidates[i - 1])`: We check if the current number is the same as the previous one and we're not at the first index.
+  - Line 20: `l1.add(candidates[i])`: We add the current number to the current combination.
+  - Line 21: `backtrack(candidates, target - candidates[i], i + 1, result, l1)`: We recursively call the backtracking function with the updated target and the next index.
+  - Line 22: `l1.remove(l1.size() - 1)`: We remove the last added number from the current combination to backtrack.
 
 ### Code
 ```java
@@ -91,9 +104,7 @@ class Solution {
             if (candidates[i] > target) {
                 break;
             }
-            if (i > index && candidates[i] == candidates[i - 1]) {
-                continue;
-            }
+            if (i > index && candidates[i] == candidates[i - 1]) continue;
             l1.add(candidates[i]);
             backtrack(candidates, target - candidates[i], i + 1, result, l1);
             l1.remove(l1.size() - 1);
@@ -103,12 +114,9 @@ class Solution {
 ```
 
 ### Complexity
-- Time: The time complexity is O(2^n), where n is the number of candidates. In the worst case, we might need to explore all possible combinations of candidates. However, the sorting and duplicate avoidance mechanisms help reduce the number of branches to explore. The average time complexity is O(2^m), where m is the number of unique candidates.
-- Space: The space complexity is O(m), where m is the maximum depth of the recursion tree. This corresponds to the maximum size of the current combination `l1`. The `result` list stores all combinations that sum up to the target, which can require up to O(n) space in the worst case.
+- Time: The time complexity of this solution is O(2^n) in the worst case, where n is the length of the input array. This is because in the worst case, we might have to explore all possible combinations of the input array. However, the sorting and the breaking out of the loop when the current number exceeds the target reduce the time complexity in practice. The space complexity of the sorting is O(n log n).
+- Space: The space complexity is O(n) for the recursion stack and the space used to store the result. The maximum depth of the recursion tree is n, and we use O(n) space to store the current combination and the result.
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-1. What if the `candidates` array is not sorted, and we still want to use backtracking to solve the problem? 
-   - We can sort the array as a preprocessing step before applying the backtracking approach.
-
-2. How can we optimize the solution if the `target` sum is very large, and the `candidates` array contains a mix of small and large numbers?
-   - We can use a more efficient pruning strategy by breaking the loop as soon as the current candidate exceeds the remaining `target` sum. This is already implemented in the code. Additionally, we can consider using a more advanced algorithm, such as dynamic programming, to solve the problem more efficiently.
+- What if the input array contains negative numbers? In this case, the solution would need to be modified to handle negative numbers correctly. One possible approach would be to separate the positive and negative numbers and handle them separately.
+- How can we optimize the solution further? One possible optimization would be to use a more efficient sorting algorithm, such as counting sort or radix sort, if the input array contains a limited range of numbers. Another possible optimization would be to use a more efficient data structure, such as a linked list, to store the current combination and the result.
