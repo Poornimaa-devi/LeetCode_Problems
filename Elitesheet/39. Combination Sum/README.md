@@ -44,79 +44,99 @@ These are the only two combinations.
 
 # 🛍️ Combination-Sum | Explained
 
-## Approach 1: Backtracking
+## Approach 1 (Backtracking)
 ### Intuition
-Imagine you're shopping and you have a budget (target) that you need to spend on a set of items (candidates) with varying prices. The goal is to find all possible combinations of items that sum up to your budget. This approach works by exploring all possible combinations recursively, backtracking when a combination exceeds the budget, and keeping track of valid combinations.
+The core idea behind this approach is to use a backtracking strategy to explore all possible combinations of numbers that sum up to the target. Imagine you're trying to fill a basket with a specific capacity (target) using different sized boxes (candidates). You start by placing a box in the basket and then recursively try to fill the remaining space with other boxes. If you can't fill the basket with the current set of boxes, you remove the last box (backtrack) and try a different combination. This process continues until you find all valid combinations that fill the basket exactly.
 
 ### Approach
-The algorithm starts with an empty combination and a full budget. It then iterates through each item, adds it to the current combination, and recursively explores all possible combinations with the updated budget. If the budget is exhausted (target reaches 0), the current combination is valid and added to the result. If the budget is exceeded (target becomes negative), the current combination is invalid and the algorithm backtracks by removing the last added item.
+The high-level logic flow is as follows:
+1. Initialize an empty result list to store all valid combinations.
+2. Define a recursive backtracking function that takes the current combination, result list, candidates, target, and current index as parameters.
+3. In the backtracking function, check if the target becomes zero. If so, add the current combination to the result list.
+4. If the target becomes negative, stop exploring the current branch and backtrack.
+5. Iterate through the candidates starting from the current index, add each candidate to the current combination, and recursively call the backtracking function with the updated target and combination.
+6. After each recursive call, remove the last added candidate from the combination to backtrack and explore other branches.
 
 ### Detailed Code Analysis
 Let's dive into the code block:
+
 ```java
-1class Solution {
-2    public List<List<Integer>> combinationSum(int[] candidates, int target) {
-3        List<List<Integer>> result = new ArrayList<>();
-4        backtrack(new ArrayList<>(),result,candidates,target,0);
-5        return result;
-6    }
-7    public static void backtrack(List<Integer> list1,List<List<Integer>> result,int[] nums,int target,int idx){
-8        if(target==0){
-9            result.add(new ArrayList<>(list1));
-10            return;
-11        }
-12        if(target<0){
-13            return;
-14        }
-15        for(int i=idx;i<nums.length;i++){
-16            list1.add(nums[i]);
-17            backtrack(list1,result,nums,target-nums[i],i);
-18            list1.remove(list1.size()-1);
-19        }
-20    }
-21}
+public List<List<Integer>> combinationSum(int[] candidates, int target) {
+    List<List<Integer>> result = new ArrayList<>();
+    backtrack(new ArrayList<>(), result, candidates, target, 0);
+    return result;
+}
 ```
-Here's what the code does:
-- Line 3: An empty list `result` is initialized to store all valid combinations.
-- Line 4: The `backtrack` function is called with an empty list `list1`, the `result` list, the `candidates` array, the `target`, and an index `idx` set to 0.
-- In the `backtrack` function:
-  - Line 8-10: If the target reaches 0, a valid combination is found, and a copy of `list1` is added to the `result`.
-  - Line 12-13: If the target becomes negative, the current combination is invalid, and the function returns (backtracks).
-  - Line 15-19: The function iterates through each item in the `candidates` array starting from the current index `idx`. For each item:
-    - Line 16: The item is added to the current combination `list1`.
-    - Line 17: The `backtrack` function is called recursively with the updated combination, target, and index.
-    - Line 18: After the recursive call returns, the last added item is removed from the combination (backtracking).
+
+In this code block:
+- A `result` list is initialized to store all valid combinations.
+- The `backtrack` function is called with an empty combination, `result` list, `candidates`, `target`, and initial index `0`.
+- The `backtrack` function is responsible for exploring all possible combinations recursively.
+
+Now, let's analyze the `backtrack` function:
+
+```java
+public static void backtrack(List<Integer> list1, List<List<Integer>> result, int[] nums, int target, int idx) {
+    if (target == 0) {
+        result.add(new ArrayList<>(list1));
+        return;
+    }
+    if (target < 0) {
+        return;
+    }
+    for (int i = idx; i < nums.length; i++) {
+        list1.add(nums[i]);
+        backtrack(list1, result, nums, target - nums[i], i);
+        list1.remove(list1.size() - 1);
+    }
+}
+```
+
+In this function:
+- `list1` represents the current combination being explored.
+- `result` is the list of all valid combinations found so far.
+- `nums` is the array of candidate numbers.
+- `target` is the remaining sum needed to reach the target.
+- `idx` is the current index in the `nums` array.
+- The base cases are:
+  - If `target` becomes zero, it means we've found a valid combination, so we add it to the `result` list.
+  - If `target` becomes negative, we stop exploring the current branch and backtrack.
+- The recursive case:
+  - Iterate through the `nums` array starting from `idx`.
+  - For each candidate, add it to the current combination `list1`.
+  - Recursively call `backtrack` with the updated `target` (reduced by the added candidate's value) and the same index `i` (since we can use the same candidate multiple times).
+  - After the recursive call, remove the last added candidate from `list1` to backtrack and explore other branches.
 
 ### Code
 ```java
 public List<List<Integer>> combinationSum(int[] candidates, int target) {
     List<List<Integer>> result = new ArrayList<>();
-    backtrack(new ArrayList<>(),result,candidates,target,0);
+    backtrack(new ArrayList<>(), result, candidates, target, 0);
     return result;
 }
 
-public static void backtrack(List<Integer> list1,List<List<Integer>> result,int[] nums,int target,int idx){
-    if(target==0){
+public static void backtrack(List<Integer> list1, List<List<Integer>> result, int[] nums, int target, int idx) {
+    if (target == 0) {
         result.add(new ArrayList<>(list1));
         return;
     }
-    if(target<0){
+    if (target < 0) {
         return;
     }
-    for(int i=idx;i<nums.length;i++){
+    for (int i = idx; i < nums.length; i++) {
         list1.add(nums[i]);
-        backtrack(list1,result,nums,target-nums[i],i);
-        list1.remove(list1.size()-1);
+        backtrack(list1, result, nums, target - nums[i], i);
+        list1.remove(list1.size() - 1);
     }
 }
 ```
+
 ### Complexity
-- Time: The time complexity is O(N^(T/M + 1)), where N is the length of the candidates array, T is the target sum, and M is the minimum value in the candidates array. This is because in the worst-case scenario, the algorithm explores all possible combinations of items that sum up to the target.
-- Space: The space complexity is O(T/M), which is the maximum recursion depth. This is because the algorithm uses a recursive approach to explore all possible combinations, and the maximum recursion depth is determined by the size of the target sum and the minimum value in the candidates array.
+- Time: O(N^(T/M) + 1), where N is the length of the candidates array, T is the target sum, and M is the minimum value in the candidates array. This is because in the worst case, we might have to explore all possible combinations of candidates that sum up to the target.
+- Space: O(T/M), which is the maximum depth of the recursion call stack. This is because we need to store the current combination being explored, which can have at most T/M elements.
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-Some common follow-up questions for this pattern include:
-- What if the candidates array contains duplicates? How would you modify the algorithm to handle duplicates?
-  - Answer: To handle duplicates, you can sort the candidates array and skip duplicates during the iteration.
-- What if the target sum is very large? How would you optimize the algorithm to handle large target sums?
-  - Answer: To handle large target sums, you can use a more efficient data structure, such as a dynamic programming table, to store and reuse intermediate results.
+1. What if the candidates array contains duplicates? How would you modify the solution to handle duplicates?
+   - To handle duplicates, we can sort the candidates array and skip duplicate elements in the backtracking process.
+2. What if the candidates array is very large, and we want to optimize the solution for memory usage?
+   - To optimize memory usage, we can use an iterative approach instead of recursion, which would reduce the memory needed for the call stack. We can also use a more efficient data structure, such as a queue, to store the combinations to be explored.
