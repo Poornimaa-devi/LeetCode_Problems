@@ -26,28 +26,31 @@
 
 # 🛍️ Subarray-Sum-Equals-K | Explained
 
-## Approach 1 (Optimized)
+## Approach 1: Hash Table Optimization
 ### Intuition
-The core idea behind this approach is to utilize a hashmap to store the cumulative sum of elements in the array and their frequencies. This approach is based on the concept that if the cumulative sum at index `j` is `sum`, and the cumulative sum at index `i` is `sum - k`, then the sum of the subarray from `i+1` to `j` is `k`. This idea works because it allows us to efficiently calculate the number of subarrays with sum equal to `k` by looking up the frequency of `sum - k` in the hashmap.
+Imagine you are the manager of a warehouse where you store the cumulative sum of inventory values. Every time you receive a new shipment, you update the cumulative sum. If you have a target inventory value, you can quickly find out how many times you have had that exact value in the past by checking your warehouse records. This approach works by leveraging a hash table to store the cumulative sum of the array elements and their frequencies, allowing for efficient lookups and updates.
 
 ### Approach
-1. Initialize a hashmap to store the cumulative sum and its frequency.
-2. Initialize variables to store the cumulative sum and the answer (number of subarrays with sum equal to `k`).
-3. Iterate through the array, updating the cumulative sum and frequency in the hashmap.
-4. For each cumulative sum, check if `sum - k` exists in the hashmap. If it does, increment the answer by the frequency of `sum - k`.
+The algorithmic approach can be broken down into the following steps:
+1. Initialize a hash table to store the cumulative sum and its frequency.
+2. Initialize the cumulative sum and the answer variable.
+3. Iterate through the array, updating the cumulative sum at each step.
+4. For each cumulative sum, check if the hash table contains the difference between the current cumulative sum and the target sum (k).
+5. If the difference exists, increment the answer by the frequency of the difference in the hash table.
+6. Update the frequency of the current cumulative sum in the hash table.
+7. Return the answer, which represents the number of subarrays with a sum equal to k.
 
 ### Detailed Code Analysis
-The provided code implements this approach using the following key components:
-- `sum`: Stores the cumulative sum of elements in the array.
-- `ans`: Stores the number of subarrays with sum equal to `k`.
-- `map`: A hashmap that stores the cumulative sum and its frequency.
-
-Here's a line-by-line explanation:
-- `map.put(0,1)`: Initializes the hashmap with a cumulative sum of `0` and a frequency of `1`. This is because the cumulative sum at index `-1` is `0`, and there is one such occurrence.
-- `sum += nums[j]`: Updates the cumulative sum by adding the current element.
-- `if(map.containsKey(sum -k))`: Checks if `sum - k` exists in the hashmap.
-- `ans += map.get(sum-k)`: If `sum - k` exists, increments the answer by the frequency of `sum - k`.
-- `map.put(sum,map.getOrDefault(sum,0)+1)`: Updates the frequency of the current cumulative sum in the hashmap.
+Let's dive into the code block line by line:
+1. `int sum = 0;` initializes the cumulative sum variable to 0.
+2. `int ans = 0;` initializes the answer variable to 0, which will store the number of subarrays with a sum equal to k.
+3. `HashMap<Integer,Integer> map = new HashMap<>();` creates a hash table to store the cumulative sum and its frequency. The key represents the cumulative sum, and the value represents the frequency.
+4. `map.put(0,1);` initializes the hash table with a cumulative sum of 0 and a frequency of 1. This is because an empty subarray has a sum of 0.
+5. The `for` loop iterates through the array, updating the cumulative sum at each step: `sum += nums[j];`.
+6. The `if` condition checks if the hash table contains the difference between the current cumulative sum and the target sum (k): `if(map.containsKey(sum -k))`.
+7. If the difference exists, the answer is incremented by the frequency of the difference in the hash table: `ans += map.get(sum-k);`.
+8. The frequency of the current cumulative sum is updated in the hash table: `map.put(sum,map.getOrDefault(sum,0)+1);`.
+The hash table is used to store the cumulative sum and its frequency, allowing for efficient lookups and updates. The `getOrDefault` method is used to handle the case where the cumulative sum is not present in the hash table, in which case it defaults to 0.
 
 ### Code
 ```java
@@ -70,14 +73,12 @@ class Solution {
 ```
 
 ### Complexity
-- Time: The time complexity of this approach is **O(n)**, where **n** is the length of the input array `nums`. This is because we make a single pass through the array, and each operation (hashmap lookup and update) takes constant time on average.
-- Space: The space complexity of this approach is **O(n)**, as in the worst-case scenario (when all cumulative sums are distinct), we may store up to **n** entries in the hashmap.
+- Time: The time complexity is O(n), where n is the length of the array. This is because we are iterating through the array once, and the hash table operations (put and get) have an average time complexity of O(1).
+- Space: The space complexity is O(n), as in the worst case, we may need to store all cumulative sums in the hash table.
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-Some potential follow-up questions for this problem include:
-- How would you modify the solution to find the maximum-length subarray with sum equal to `k`?
-- What if the input array is very large and doesn't fit into memory? How would you modify the solution to handle this case? 
-
-Brief answers:
-- To find the maximum-length subarray with sum equal to `k`, we can modify the solution to store the start index of each cumulative sum in the hashmap, and then update the answer based on the length of the subarray.
-- If the input array is too large to fit into memory, we can use a streaming or chunking approach to process the array in chunks, and use a similar hashmap-based approach to find the number of subarrays with sum equal to `k` within each chunk. The results can then be combined to get the final answer.
+Some common follow-up questions for this pattern include:
+1. How would you handle the case where the array is too large to fit into memory?
+ Answer: You could consider using a more memory-efficient data structure, such as a trie, or processing the array in chunks.
+2. How would you modify the solution to find the number of subarrays with a sum within a certain range (e.g., between k1 and k2)?
+ Answer: You could modify the solution to use a range query data structure, such as a segment tree or a range tree, to efficiently find the number of cumulative sums within the desired range.
