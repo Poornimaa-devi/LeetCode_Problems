@@ -41,84 +41,57 @@
 
 # 🛍️ Set-Matrix-Zeroes | Explained
 
-## Approach 1 (Two-Pass)
+## Approach 1 (Two-Pass with Extra Space)
 ### Intuition
-Imagine you're a librarian, and you have a huge bookshelf (matrix) with books (cells) on it. You need to find all the books that are defective (zero) and then mark all the shelves (rows) and sections (columns) where those defective books are located. After that, you go back and replace all the books on the marked shelves and sections with defective ones (zero). This approach works because it allows us to identify the rows and columns that need to be zeroed out without modifying the original matrix until we've had a chance to examine every cell.
+Imagine you're the manager of a large library with rows of shelves. Each shelf represents a row in the matrix, and each book on the shelf represents an element in that row. When you find a book with a "zero" label (representing a zero in the matrix), you need to mark the entire shelf (row) and the section where the book is located (column) for later removal. This approach uses extra space (like sticky notes) to mark which rows and columns need to be zeroed out. The two-pass method ensures that we first identify which rows and columns to zero out, and then we go back through and actually set those elements to zero.
 
 ### Approach
-The two-pass approach involves first identifying the rows and columns that contain zeros, and then using that information to set the corresponding cells in the matrix to zero. Here's a high-level breakdown of the steps:
-1. Iterate over the matrix to identify the rows and columns that contain zeros.
-2. Record the indices of the rows and columns that contain zeros in separate arrays.
-3. Iterate over the matrix again, and for each cell, check if its row or column index is in the arrays of indices to be zeroed out.
-4. If a cell's row or column index is in the arrays, set the cell to zero.
+The algorithmic steps are as follows:
+1. Initialize the number of rows and columns in the matrix.
+2. Create two boolean arrays to keep track of which rows and columns need to be zeroed out.
+3. Perform a first pass through the matrix to identify which rows and columns contain a zero.
+4. Perform a second pass through the matrix to set the elements in the identified rows and columns to zero.
 
 ### Detailed Code Analysis
-Let's take a closer look at the code:
-```java
-int rowCount = matrix.length;
-int colCount = matrix[0].length;
-```
-These lines initialize variables to store the number of rows and columns in the matrix.
-
-```java
-boolean[] rows = new boolean[rowCount];
-boolean[] cols = new boolean[colCount];
-boolean isEmpty = true;
-```
-These lines create boolean arrays to keep track of which rows and columns need to be zeroed out. The `isEmpty` variable is used to track whether any zeros were found in the matrix.
-
-```java
-for (int i = 0; i < rowCount; i++)
-    for (int j = 0; j < colCount; j++)
-        if (matrix[i][j] == 0) {
-            rows[i] = true;
-            cols[j] = true;
-            isEmpty = false;
-        }
-```
-This nested loop iterates over the matrix, checking each cell for zeros. When a zero is found, the corresponding row and column indices are marked for zeroing out in the `rows` and `cols` arrays, and the `isEmpty` variable is set to `false`.
-
-```java
-if (!isEmpty)
-    for (int i = 0; i < rowCount; i++)
-        for (int j = 0; j < colCount; j++)
-            if (rows[i] || cols[j])
-                matrix[i][j] = 0;
-```
-If the `isEmpty` variable is `false`, this nested loop iterates over the matrix again, setting cells to zero if their row or column index is marked for zeroing out.
+Let's take a closer look at the provided code. 
+- Lines 3-4: We initialize `rowCount` and `colCount` to store the number of rows and columns in the matrix, respectively.
+- Lines 5-6: We create two boolean arrays, `rows` and `cols`, to keep track of which rows and columns need to be zeroed out.
+- Line 7: The `isEmpty` variable is initialized but is not actually necessary for the algorithm, as we can determine if the matrix has been modified by checking the `rows` and `cols` arrays after the first pass.
+- In the first pass (lines 9-15), we iterate through each element in the matrix. If we find an element with a value of 0, we set the corresponding index in the `rows` and `cols` arrays to `true`.
+- The `isEmpty` variable (line 14) is set to `false` when a zero is found, but as mentioned earlier, it's not crucial for the algorithm.
+- In the second pass (lines 18-21), we iterate through the matrix again. This time, if the current row or column has been marked for zeroing out (i.e., `rows[i]` or `cols[j]` is `true`), we set the current element to 0.
 
 ### Code
 ```java
-public void setZeroes(int[][] matrix) {
-    int rowCount = matrix.length;
-    int colCount = matrix[0].length;
-    boolean[] rows = new boolean[rowCount];
-    boolean[] cols = new boolean[colCount];
-    boolean isEmpty = true;
-
-    for (int i = 0; i < rowCount; i++)
-        for (int j = 0; j < colCount; j++)
-            if (matrix[i][j] == 0) {
-                rows[i] = true;
-                cols[j] = true;
-                isEmpty = false;
-            }
-
-    if (!isEmpty)
+class Solution {
+    public void setZeroes(int[][] matrix) {
+        int rowCount = matrix.length;
+        int colCount = matrix[0].length;
+        boolean[] rows = new boolean[rowCount];
+        boolean[] cols = new boolean[colCount];
+        boolean isEmpty = true;      
+        
         for (int i = 0; i < rowCount; i++)
             for (int j = 0; j < colCount; j++)
-                if (rows[i] || cols[j])
-                    matrix[i][j] = 0;
+                if (matrix[i][j] == 0) {
+                    rows[i] = true;
+                    cols[j] = true;
+                    isEmpty = false;
+                }
+            
+        if (!isEmpty)
+            for (int i = 0; i < rowCount; i++)
+                for (int j = 0; j < colCount; j++)
+                    if (rows[i] || cols[j])
+                        matrix[i][j] = 0;
+    }
 }
 ```
-
 ### Complexity
-- Time: O(m * n), where m is the number of rows and n is the number of columns in the matrix. This is because we're iterating over the matrix twice: once to identify the rows and columns to be zeroed out, and again to actually zero out the corresponding cells.
-- Space: O(m + n), where m is the number of rows and n is the number of columns in the matrix. This is because we're using boolean arrays to keep track of the rows and columns to be zeroed out.
+- Time: The time complexity is O(m*n), where m is the number of rows and n is the number of columns in the matrix. This is because we are performing two separate passes through the matrix.
+- Space: The space complexity is O(m + n), as we are using two additional arrays of size m and n to keep track of rows and columns to be zeroed out.
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-Some possible follow-up questions for this problem might include:
-- What if the input matrix is extremely large? How would you optimize the solution to handle that case?
-  Answer: One possible optimization would be to use a more space-efficient data structure to keep track of the rows and columns to be zeroed out, such as a HashSet or a bit vector.
-- What if the input matrix is sparse (i.e., most of the cells are zeros)? How would you take advantage of that property to optimize the solution?
-  Answer: One possible optimization would be to use a sparse matrix representation, such as a dictionary of (row, column) pairs, to store the non-zero cells. This could reduce the space complexity of the solution.
+Some common follow-up questions for this problem include:
+1. Can you optimize the space complexity? Yes, we can optimize the space complexity to O(1) by using the first row and first column of the matrix to store the information about which rows and columns to zero out, instead of using separate arrays. However, this approach is more complex and requires additional checks to handle edge cases.
+2. How would you handle a sparse matrix? The provided solution will work correctly for sparse matrices, as it only iterates through the elements of the matrix and does not rely on the density of the matrix. However, a more optimized solution might take advantage of the sparsity to reduce the time complexity.
