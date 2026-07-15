@@ -53,25 +53,29 @@ myQueue.empty(); // return false
 
 # 🛍️ Implement-Queue-using-Stacks | Explained
 
-## Approach 1: Two-Stack Approach
+## Approach 1 (Optimized Two-Stack Implementation)
 ### Intuition
-The core idea behind this approach is to utilize two stacks to mimic the behavior of a queue. A queue follows the First-In-First-Out (FIFO) principle, which means the first element that is added to the queue is the first one to be removed. However, stacks follow the Last-In-First-Out (LIFO) principle, meaning the last element added to the stack is the first one to be removed. By using two stacks, we can leverage this LIFO behavior to achieve the FIFO principle of a queue. Think of it like two boxes where you add items to one box (the "inbox") and then move items from the inbox to the other box (the "outbox") whenever you need to process them in the order they were received.
+Imagine you have two stacks of plates, `s1` and `s2`. You can add plates to the top of `s1`, but to remove a plate from the "front" (the bottom plate in `s1`), you'd have to first move all the plates from `s1` to `s2` to reverse their order. Once the plates are in `s2`, you can simply pop the top one off to remove the front plate. This process of moving plates from `s1` to `s2` allows you to mimic a queue's First-In-First-Out (FIFO) behavior using two stacks.
 
 ### Approach
-Here's a step-by-step breakdown of how this approach works:
-1. When an element is added to the queue (via the `push` operation), it is directly pushed onto the first stack (`s1`).
-2. When an element needs to be removed from the queue (via the `pop` operation), we check if the second stack (`s2`) is empty. If it is, we pop all elements from the first stack (`s1`) and push them onto the second stack (`s2`). This effectively reverses the order of the elements, so the oldest element (the one that was added first) is now at the top of the second stack.
-3. After ensuring the second stack is not empty, we pop the top element from the second stack (`s2`), which represents the front of the queue, and return it.
-4. The `peek` operation follows a similar logic to `pop`, but instead of removing the top element from the second stack, it simply returns its value without removing it.
-5. The `empty` operation checks if both stacks are empty, in which case the queue is considered empty.
+The approach involves the following steps:
+- When adding an element, simply push it onto `s1`.
+- When removing an element (popping), check if `s2` is empty. If it is, move all elements from `s1` to `s2` to reverse their order, then pop the top element from `s2`.
+- To peek at the front element, follow the same logic as popping but instead of popping the element from `s2`, just peek at it.
+- To check if the queue is empty, verify that both `s1` and `s2` are empty.
 
 ### Detailed Code Analysis
-Let's dive into the provided code:
-- The class `MyQueue` is initialized with two private `Stack` objects, `s1` and `s2`. These stacks are used as described in the approach.
-- The `push` method simply adds an element to the top of `s1`, which represents adding an element to the back of the queue.
-- The `pop` method checks if `s2` is empty. If it is, it transfers all elements from `s1` to `s2` by popping from `s1` and pushing onto `s2`. Then, it pops and returns the top element from `s2`, which is the front of the queue.
-- The `peek` method checks if `s2` is not empty. If `s2` is empty, it transfers elements from `s1` to `s2` in the same manner as `pop`. Then, it returns the value of the top element of `s2` without popping it.
-- The `empty` method returns `true` if both `s1` and `s2` are empty, indicating the queue is empty.
+Let's break down the provided code:
+- `private Stack<Integer> s1 = new Stack<>();` and `private Stack<Integer> s2 = new Stack<>();` declare the two stacks, `s1` and `s2`, which are used to implement the queue.
+- In the `push(int x)` method, `s1.push(x);` simply adds the element `x` to the top of `s1`.
+- In the `pop()` method:
+  - `if (s2.isEmpty())` checks if `s2` is empty. If it is, it means we need to move elements from `s1` to `s2` to reverse their order.
+  - `while (!s1.isEmpty()) s2.push(s1.pop());` does this reversal by popping elements from `s1` and pushing them onto `s2`.
+  - `return s2.pop();` then removes and returns the top element from `s2`, which is the front of the queue.
+- In the `peek()` method:
+  - It first checks if `s2` is not empty and returns the top element of `s2` if it's not empty.
+  - If `s2` is empty, it moves elements from `s1` to `s2` (just like in `pop()`) and then peeks at the top element of `s2`.
+- In the `empty()` method, `return s1.isEmpty() && s2.isEmpty();` checks if both stacks are empty, indicating the queue is empty.
 
 ### Code
 ```java
@@ -109,15 +113,14 @@ class MyQueue {
 
 ### Complexity
 - Time:
-  - `push`: O(1) because it involves a single operation of pushing onto a stack.
-  - `pop`: Amortized O(1), but worst-case O(n) when elements need to be transferred from `s1` to `s2`. Here, n is the number of elements in `s1`.
-  - `peek`: Similar to `pop`, amortized O(1) and worst-case O(n) for the same reason.
-  - `empty`: O(1) because it involves checking the emptiness of two stacks.
-- Space: O(n) because in the worst case, we might have all elements in one of the stacks. Here, n is the total number of elements added to the queue.
+  - `push(int x)`: O(1) since it's just a simple push operation onto `s1`.
+  - `pop()`: Amortized O(1), but worst-case O(n) when `s2` is empty and all elements need to be moved from `s1` to `s2`.
+  - `peek()`: Similar to `pop()`, amortized O(1) but worst-case O(n) when `s2` is empty.
+  - `empty()`: O(1) since it's just checking if both stacks are empty.
+- Space: O(n) since in the worst case, we might have all elements stored in either `s1` or `s2` (or split between them).
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-1. **How would you optimize the `pop` and `peek` operations to always achieve O(1) time complexity?**
-   - One approach to optimize these operations would involve maintaining a reference to the front of the queue. However, given the constraints of using only stacks, the current implementation provides an amortized O(1) time complexity, which is a practical optimization for most scenarios.
-
-2. **What are the implications of using a single stack instead of two stacks for this problem?**
-   - Using a single stack would not allow for an efficient implementation of a queue since you cannot directly achieve the FIFO behavior with a single LIFO data structure. The two-stack approach provides a straightforward way to emulate a queue's behavior using stacks.
+- **Q:** How would you optimize the implementation if you knew the maximum size of the queue beforehand?
+  - **A:** Knowing the maximum size beforehand allows for potential optimizations in memory allocation for the stacks, but the basic algorithm remains the same.
+- **Q:** What are the trade-offs between using this two-stack implementation versus other queue implementations (e.g., linked lists)?
+  - **A:** The two-stack implementation offers simplicity and can be efficient for certain use cases, but other implementations like linked lists might offer better performance for insertion and deletion at arbitrary positions or better memory usage for sparse queues.
