@@ -45,47 +45,77 @@
 
 # 🛍️ Next-Greater-Element-I | Explained
 
-The code provided appears to be an attempt to solve the Next-Greater-Element-I problem on LeetCode. However, it seems to be incomplete and contains some logical inconsistencies. We will attempt to analyze the given code and provide a detailed explanation of the approach that can be inferred from it.
-
-## Approach 1 (Incomplete Solution)
+## Approach 1: Monotonic Stack with Hash Map
 ### Intuition
-The intuition behind this approach seems to be using a stack to track the elements from the second array (`nums2`) and a map to store the next greater element for each element in `nums2`. This is a common approach to solve this problem.
+The core idea behind this approach is to use a monotonic stack to efficiently find the next greater element for each element in `nums2`. By iterating over `nums2` in reverse order and utilizing a stack to keep track of the elements that do not have a greater element yet, we can construct a hash map that maps each element to its next greater element. This approach works because it ensures that the stack always contains elements in decreasing order, allowing us to easily find the next greater element for each element.
+
+### Algorithm Visualized
+```mermaid
+graph LR
+    A[ nums2 ] --> B[ Reverse Iteration ]
+    B --> C[ Monotonic Stack ]
+    C --> D[ Hash Map Construction ]
+    D --> E[ Next Greater Element Mapping ]
+```
 
 ### Approach
-The high-level idea is to iterate over `nums2` and use a stack to keep track of the elements. For each element, check if the stack is empty or if the top element of the stack is smaller than the current element. If it is, pop the stack and repeat the process until the stack is empty or the top element is greater than the current element. However, this approach is not fully implemented in the given code.
+The approach involves the following high-level steps:
+1. Initialize an empty stack and a hash map to store the next greater element for each element.
+2. Iterate over `nums2` in reverse order.
+3. For each element, pop all elements from the stack that are less than or equal to the current element.
+4. If the stack is empty after popping, it means there is no greater element for the current element, so we map it to -1 in the hash map.
+5. Otherwise, we map the current element to the top element of the stack, which is its next greater element.
+6. Push the current element onto the stack to maintain the monotonic property.
+7. After constructing the hash map, iterate over `nums1` and use the hash map to find the next greater element for each element.
 
 ### Detailed Code Analysis
-Let's analyze the given code block-by-block:
-
-- The first block of code `map.put(nums2[i], st.peek());` suggests that the code is trying to store the next greater element for each element in `nums2` in a map. However, the condition under which this line is executed is not clear from the given code.
-- The `if (st.isEmpty())` block suggests that the code is trying to handle the case when the stack is empty. In this case, it stores `-1` as the next greater element for the current element in `nums2`.
-- The `while (!st.isEmpty() && st.peek() <= nums2[i])` loop is trying to pop elements from the stack as long as the top element is smaller than the current element in `nums2`. However, the purpose of this loop is not clear from the given code.
-- The `for (int i = nums2.length - 1; i >= 0; i--)` loop seems to be pushing all elements from `nums2` onto the stack in reverse order. However, this is not a typical step in the Next-Greater-Element-I problem solution.
-- The `int[] ans = new int[nums1.length];` line suggests that the code is trying to store the next greater elements for `nums1` in an array. However, the code that populates this array is not provided.
+Let's dive into the code:
+- Lines 3-4: Initialize an empty stack `st` and a hash map `map` to store the next greater element for each element.
+- Lines 6-19: Iterate over `nums2` in reverse order using a for loop.
+  - Line 8: While the stack is not empty and the top element of the stack is less than or equal to the current element, pop the top element from the stack. This ensures that the stack always contains elements in decreasing order.
+  - Line 12: If the stack is empty after popping, it means there is no greater element for the current element, so we map it to -1 in the hash map.
+  - Line 15: Otherwise, we map the current element to the top element of the stack, which is its next greater element.
+  - Line 18: Push the current element onto the stack to maintain the monotonic property.
+- Lines 21-24: Iterate over `nums1` and use the hash map to find the next greater element for each element. The result is stored in the `ans` array.
 
 ### Code
 ```java
-// Incomplete code snippet
-map.put(nums2[i], st.peek());
-if (st.isEmpty()) {
-    map.put(nums2[i], -1);
-}
-while (!st.isEmpty() && st.peek() <= nums2[i]) {
-    st.pop();
-}
-for (int i = nums2.length - 1; i >= 0; i--) {
-    st.push(nums2[i]);
-}
-int[] ans = new int[nums1.length];
-for (int i = 0; i < nums1.length; i++) {
-    // Code to populate the ans array is missing
+class Solution {
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        Stack<Integer> st = new Stack<>();
+        HashMap<Integer, Integer> map = new HashMap<>();
+
+        for (int i = nums2.length - 1; i >= 0; i--) {
+            while (!st.isEmpty() && st.peek() <= nums2[i]) {
+                st.pop();
+            }
+
+            if (st.isEmpty()) {
+                map.put(nums2[i], -1);
+            } else {
+                map.put(nums2[i], st.peek());
+            }
+
+            st.push(nums2[i]);
+        }
+
+        int[] ans = new int[nums1.length];
+        for (int i = 0; i < nums1.length; i++) {
+            ans[i] = map.get(nums1[i]);
+        }
+
+        return ans;
+    }
 }
 ```
 
 ### Complexity
-It's difficult to determine the time and space complexity of this approach as the code is incomplete. However, if the approach was fully implemented, the time complexity would likely be O(n + m) where n and m are the lengths of `nums1` and `nums2`, respectively, and the space complexity would be O(n + m) due to the use of the stack and map.
+- **Time:** The time complexity is O(n + m), where n is the length of `nums1` and m is the length of `nums2`. This is because we iterate over `nums2` once to construct the hash map and then iterate over `nums1` once to find the next greater element for each element.
+- **Space:** The space complexity is O(m), where m is the length of `nums2`. This is because in the worst case, we might need to store all elements of `nums2` in the hash map. The stack also uses O(m) space in the worst case. The output array uses O(n) space, but this is not included in the space complexity as it is required for the output.
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-Some common follow-up questions for this problem include:
-- What if `nums1` and `nums2` are very large? How can we optimize the solution to handle this case?
-- Can we solve this problem without using a map? If so, how?
+Some possible follow-up questions for this pattern include:
+- How would you optimize the solution if `nums1` and `nums2` are very large?
+  Answer: You could use a more efficient data structure, such as a `TreeMap`, to store the next greater element for each element. However, this would not change the overall time complexity of the solution.
+- What if `nums2` is not given, and you only have `nums1`? How would you find the next greater element for each element in `nums1`?
+  Answer: You would need to use a different approach, such as using a stack to keep track of the elements that do not have a greater element yet, similar to the original solution. However, you would need to iterate over `nums1` twice, once to construct the stack and once to find the next greater element for each element.
