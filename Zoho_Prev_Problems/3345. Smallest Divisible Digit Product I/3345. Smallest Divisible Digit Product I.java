@@ -1,0 +1,1 @@
+        while(n > 0){            else n++;        }    }    public int digitproduct(int n){        int prod = 1;class Solution {    public int smallestNumber(int n, int t) {        if(digitproduct(n)%t == 0) return n;        while(true){            int ans = digitproduct(n);            if(ans%t==0) return n;
