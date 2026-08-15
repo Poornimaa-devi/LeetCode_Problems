@@ -44,59 +44,53 @@
 
 ## Approach 1: Bitwise XOR Accumulation
 ### Intuition
-The approach works by utilizing the properties of bitwise XOR operation. In this problem, we aim to find the longest subsequence where the bitwise XOR of all elements is non-zero. The XOR operation has the property that `a ^ a = 0` and `a ^ 0 = a`. This means that if we XOR all elements in the array, a non-zero result indicates the presence of at least one non-zero element. The approach iterates through the array, maintaining a flag to track if any non-zero element is encountered and accumulates the XOR of all elements.
+This approach works by accumulating the bitwise XOR of all elements in the input array. The core idea is that if the final result is non-zero, it means that there exists at least one non-zero element in the array, and therefore the longest subsequence with non-zero bitwise XOR is the entire array itself. On the other hand, if the final result is zero, it means that the array can be divided into two subsequences with zero bitwise XOR, and the longest subsequence with non-zero bitwise XOR is the array minus one element.
 
 ### Algorithm Visualized
 ```mermaid
 graph LR
     A[Start] --> B[Initialize result and hasnonzero]
-    B --> C[Iterate through array]
-    C --> D{Encounter non-zero element?}
-    D -->|Yes| E[Set hasnonzero to true]
-    D -->|No| F[Continue iteration]
-    E --> F
-    F --> G[Accumulate XOR of current element]
-    G --> H{End of array?}
-    H -->|Yes| I[Check result and return]
-    H -->|No| C
-    I --> J[Return length or length - 1]
+    B --> C[Iterate over array]
+    C --> D[Update result and hasnonzero]
+    D --> E[Check if result is non-zero]
+    E --> F[Return length of array if result is non-zero]
+    E --> G[Return length of array minus one if result is zero]
+    G --> H[End]
 ```
 
 ### Approach
-The algorithm starts by initializing variables to track the result of the XOR operation and a flag to indicate if any non-zero element is encountered. It then iterates through the array, updating the flag and accumulating the XOR of all elements. After iterating through the entire array, it checks the result of the XOR operation and returns the length of the array if the result is non-zero, or the length minus one if the result is zero.
+The algorithm starts by initializing two variables: `result` to store the cumulative bitwise XOR of the array elements, and `hasnonzero` to track whether at least one non-zero element has been encountered. It then iterates over the array, updating `result` and `hasnonzero` accordingly. Finally, it checks the value of `result` and returns the length of the array or the length of the array minus one, depending on whether `result` is non-zero or zero.
 
 ### Detailed Code Analysis
-Let's break down the code step by step:
-- Line 1: `class Solution {` defines a class named `Solution`.
-- Line 2: `public int longestSubsequence(int[] nums) {` defines a public method named `longestSubsequence` that takes an integer array `nums` as input and returns an integer.
-- Line 3: `int result = 0;` initializes a variable `result` to store the XOR of all elements in the array.
-- Line 4: `boolean hasnonzero = false;` initializes a flag `hasnonzero` to track if any non-zero element is encountered.
-- Line 5: `for(int i=0;i<nums.length;i++){` starts a loop that iterates through the array.
-- Line 6: `if(nums[i]!=0) hasnonzero = true;` checks if the current element is non-zero and sets the `hasnonzero` flag to true if it is.
-- Line 7: `result^=nums[i];` accumulates the XOR of the current element.
-- Line 10: `if(!hasnonzero) return 0;` checks if any non-zero element was encountered and returns 0 if not.
-- Line 11: `if(result>0) return nums.length;` checks if the result of the XOR operation is non-zero and returns the length of the array if it is.
-- Line 12: `else return nums.length-1;` returns the length of the array minus one if the result of the XOR operation is zero.
+The code initializes `result` to 0 and `hasnonzero` to `false`. It then enters a loop that iterates over the array, where for each element `nums[i]`, it updates `result` by performing a bitwise XOR operation with `nums[i]`. It also checks if `nums[i]` is non-zero and updates `hasnonzero` accordingly. After the loop, it checks the value of `result` and returns the length of the array if `result` is non-zero, or the length of the array minus one if `result` is zero.
 
 ### Code
 ```java
-public int longestSubsequence(int[] nums) {
-    int result = 0;
-    boolean hasnonzero = false;
-    for(int i=0;i<nums.length;i++){
-        if(nums[i]!=0) hasnonzero = true;
-        result^=nums[i];
+class Solution {
+    public int longestSubsequence(int[] nums) {
+        int result = 0;
+        boolean hasnonzero = false;
+        for (int i = 0; i < nums.length; i++) {
+            result ^= nums[i];
+            if (nums[i] != 0) {
+                hasnonzero = true;
+            }
+        }
+        if (!hasnonzero) {
+            return 0;
+        }
+        if (result > 0) {
+            return nums.length;
+        } else {
+            return nums.length - 1;
+        }
     }
-    if(!hasnonzero) return 0;
-    if(result>0) return nums.length;
-    else return nums.length-1;
 }
 ```
 
 ### Complexity
-- **Time:** The time complexity is O(n), where n is the length of the input array. This is because the algorithm iterates through the array once.
-- **Space:** The space complexity is O(1), which means the space required does not grow with the size of the input array. This is because the algorithm uses a constant amount of space to store the result and the flag. 
+- **Time:** The algorithm has a time complexity of O(n), where n is the length of the input array, because it iterates over the array once.
+- **Space:** The algorithm has a space complexity of O(1), because it only uses a constant amount of space to store the `result` and `hasnonzero` variables, regardless of the size of the input array.
 
 ## 🕵️‍♂️ Follow-up Questions (Optional)
-1. What if the input array is empty? The algorithm will return 0, which is correct because an empty array does not contain any subsequence.
-2. Can we optimize the algorithm to handle large input arrays? The current algorithm has a time complexity of O(n), which is optimal for this problem because we must iterate through the array at least once to find the longest subsequence with non-zero XOR. However, we can slightly optimize the code by removing the unnecessary `else` clause and directly returning `nums.length-1` when the result is zero.
+What if the input array is empty? In this case, the algorithm would return 0, which is correct because the longest subsequence with non-zero bitwise XOR of an empty array is indeed 0. Another follow-up question could be: what if the input array contains only zeros? In this case, the algorithm would return 0, which is correct because the longest subsequence with non-zero bitwise XOR of an array containing only zeros is indeed 0.
