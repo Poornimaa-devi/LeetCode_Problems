@@ -1,0 +1,1 @@
+            if(LEFT && RIGHT){                answer+=2;            }else if(LEFT || MIDDLE || RIGHT){                answer+=1;            }        }    }        return answer;}
