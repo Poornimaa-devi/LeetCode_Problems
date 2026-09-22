@@ -1,0 +1,1 @@
+    static int solve(int n,int[] dp){         if(n==0 || n==1){            return n;         }         if(dp[n]!=-1){            return dp[n];         }    public int fib(int n) {        int [] dp = new int[n+1];        Arrays.fill(dp,-1);        int res=solve(n,dp);        return res;    }class Solution {
