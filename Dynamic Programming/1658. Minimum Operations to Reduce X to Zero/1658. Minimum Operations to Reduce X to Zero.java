@@ -1,0 +1,1 @@
+        int sum=0;        int maxLen = -1;        for(int right=0;right<n;right++){    public int minOperations(int[] nums, int x) {        int n = nums.length;        int tot = 0;        for(int num : nums){            tot+=num;        }        int target = tot - x;        if(target<0) return -1;        if(target==0) return n;        int left=0;class Solution {
